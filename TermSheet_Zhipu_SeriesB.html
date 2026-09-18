@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Term Sheet — Zhipu AI Series B (Live Negotiation Copy)</title>
+<style>
+  :root{
+    --navy:#1F3864; --blue:#2E86AB; --green:#1E7A4D; --green-bg:#E8F2EC; --green-bd:#9CC5AC;
+    --body:#333333; --gray:#595959; --card:#EDF2F8; --bord:#C5D5E8;
+    --amber:#B45309; --amber-bg:#FEF3C7; --amber-bd:#F59E0B;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--body); background:#EEF1F5; font-size:14px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    max-width:880px; margin:26px auto 60px; background:#fff;
+    box-shadow:0 2px 14px rgba(31,56,100,.14); border-radius:6px; overflow:hidden;
+  }
+  .inner{padding:34px 46px 40px}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:10px;
+    padding:10px 16px; background:rgba(31,56,100,.97); color:#fff;
+    box-shadow:0 1px 6px rgba(0,0,0,.18);
+  }
+  .toolbar .tb-title{font-size:12px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:#9FC3E8; flex:1}
+  .toolbar .editcount{font-size:11.5px; color:#FDE68A; font-weight:600; white-space:nowrap}
+  .btn{
+    border:none; cursor:pointer; font-size:12px; font-weight:700; border-radius:999px;
+    padding:7px 16px; letter-spacing:.02em; transition:transform .06s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-print{background:var(--blue); color:#fff}
+  .btn-print:hover{box-shadow:0 0 0 3px rgba(46,134,171,.35)}
+  .btn-reset{background:transparent; color:#C9D8EC; border:1px solid rgba(255,255,255,.45)}
+  .btn-reset:hover{background:rgba(255,255,255,.12)}
+
+  /* ---------- header ---------- */
+  .doc-head{border-bottom:3px solid var(--navy); padding-bottom:18px; margin-bottom:6px}
+  .conf{font-size:10px; font-weight:700; letter-spacing:.18em; color:var(--amber); text-transform:uppercase; margin-bottom:10px}
+  h1.ts{font-size:30px; letter-spacing:.42em; color:var(--navy); margin:0 0 2px; font-weight:800}
+  .subline{display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap}
+  .sub{font-size:13px; color:var(--gray); font-style:italic}
+  .date{font-size:12.5px; color:var(--gray)}
+
+  .lead{font-size:12.5px; color:var(--gray); margin:14px 0 22px; border-left:3px solid var(--blue); padding-left:12px}
+
+  /* ---------- sections ---------- */
+  .sec{font-size:11px; font-weight:800; letter-spacing:.16em; color:#fff; background:var(--navy);
+       display:inline-block; padding:5px 14px; border-radius:3px; margin:26px 0 10px}
+  table.clause{width:100%; border-collapse:collapse; border:1px solid var(--bord)}
+  table.clause tr{border-bottom:1px solid var(--bord); page-break-inside:avoid}
+  table.clause tr:last-child{border-bottom:none}
+  td.num{width:64px; vertical-align:top; padding:10px 4px 10px 12px; font-weight:800; color:var(--blue); font-size:12px; white-space:nowrap; position:relative}
+  td.cl{width:190px; vertical-align:top; padding:10px 8px 10px 0; font-weight:700; color:var(--navy); font-size:12.5px}
+  td.ct{vertical-align:top; padding:10px 14px 10px 0; font-size:12.8px}
+  td.ct .muted{color:var(--gray); font-size:11.8px}
+  ul.tick{margin:4px 0 0; padding-left:16px}
+  ul.tick li{margin:2.5px 0}
+
+  /* highlight card row — 2.5 board */
+  tr.hl td{background:var(--green-bg); border-top:1px solid var(--green-bd); border-bottom:1px solid var(--green-bd)}
+  tr.hl td.num{color:var(--green)}
+  tr.hl td.cl{color:var(--green)}
+  tr.hl td.ct .big{color:var(--green); font-weight:800; font-size:13.5px}
+
+  /* ---------- fully editable clauses ---------- */
+  td.num .numedit{display:inline-block; min-width:22px}
+  td.num, td.cl, td.ct{cursor:text}
+  td.num:hover, td.cl:hover, td.ct:hover{background:var(--card)}
+  td.num:focus, td.cl:focus, td.ct:focus, .numedit:focus{outline:none; background:#EDF4FB}
+  tr.cl-edited td.num, tr.cl-edited td.cl{color:var(--amber)}
+  tr.cl-edited td.ct{box-shadow:inset 3px 0 0 var(--amber-bd)}
+  tr.hl.cl-edited td.num, tr.hl.cl-edited td.cl{color:var(--amber)}
+
+  /* ---------- add / remove clause ---------- */
+  tr.addrow td{padding:8px 4px 10px 12px}
+  .addbtn{
+    border:1.5px dashed var(--bord); background:#F6F9FC; color:var(--blue);
+    font-size:11.5px; font-weight:700; border-radius:4px; padding:5px 14px; cursor:pointer; letter-spacing:.03em;
+  }
+  .addbtn:hover{background:var(--card); border-color:var(--blue)}
+  .delbtn{
+    position:absolute; top:8px; right:0; width:16px; height:16px; line-height:14px; text-align:center;
+    border:none; background:transparent; color:#B6C2D4; font-size:14px; cursor:pointer; border-radius:3px;
+    opacity:0; transition:opacity .1s ease;
+  }
+  tr:hover .delbtn{opacity:1}
+  .delbtn:hover{color:#D0533E; background:#F6E4DF}
+
+  /* ---------- editable header fields (date) ---------- */
+  .ed{
+    border-bottom:1.5px dashed rgba(46,134,171,.65); cursor:text; padding:0 2px; border-radius:2px;
+    transition:background .12s ease;
+  }
+  .ed:hover{background:var(--card)}
+  .ed:focus{outline:none; background:#E3F0E8; border-bottom-color:var(--green)}
+  .ed.edited{background:var(--amber-bg); border-bottom:1.5px solid var(--amber-bd); color:var(--amber); font-weight:700}
+  .hint{font-size:10.5px; color:var(--gray); margin-top:16px; display:flex; align-items:center; gap:6px}
+
+  /* ---------- signature ---------- */
+  .sig{display:flex; gap:60px; margin-top:36px; page-break-inside:avoid}
+  .sig .party{flex:1}
+  .sig .who{font-size:12px; font-weight:700; color:var(--navy); margin-bottom:26px}
+  .sig .line{border-bottom:1px solid var(--body); margin-bottom:5px}
+  .sig .cap{font-size:10.5px; color:var(--gray)}
+
+  .foot{margin-top:26px; padding-top:12px; border-top:1px solid var(--bord); font-size:10.5px; color:var(--gray)}
+
+  /* ---------- access gate ---------- */
+  .gate{
+    position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center;
+    background:#101B2E; font-family:inherit;
+  }
+  .gate-card{
+    width:340px; background:#16233B; border:1px solid #2E4E7E; border-radius:10px;
+    padding:30px 28px 26px; box-shadow:0 10px 40px rgba(0,0,0,.5); text-align:center;
+  }
+  .gate-card .g-eyebrow{font-size:10px; letter-spacing:.22em; color:#9FC3E8; text-transform:uppercase; font-weight:700; margin-bottom:8px}
+  .gate-card .g-title{font-size:19px; color:#fff; font-weight:800; margin-bottom:4px}
+  .gate-card .g-sub{font-size:11.5px; color:#8FA6C6; margin-bottom:20px; line-height:1.5}
+  .gate-card input{
+    width:100%; padding:10px 12px; font-size:14px; letter-spacing:.14em; text-align:center;
+    border:1px solid #2E4E7E; border-radius:6px; background:#0D1626; color:#E8EFF9; outline:none; margin-bottom:12px;
+  }
+  .gate-card input:focus{border-color:var(--blue)}
+  .gate-card .g-btn{
+    width:100%; padding:10px 0; font-size:13px; font-weight:700; border:none; border-radius:6px;
+    background:var(--blue); color:#fff; cursor:pointer; letter-spacing:.06em;
+  }
+  .gate-card .g-btn:hover{filter:brightness(1.1)}
+  .gate-card .g-err{font-size:11px; color:#F87171; margin-top:10px; min-height:14px}
+
+  /* ---------- print ---------- */
+  @page{size:A4; margin:11mm 11mm}
+  @media print{
+    body{background:#fff; font-size:10.6px}
+    .sheet{box-shadow:none; margin:0; border-radius:0; max-width:none}
+    .inner{padding:0}
+    table.clause td.num{width:52px; padding:7px 4px 7px 10px; font-size:10.5px}
+    table.clause td.cl{width:168px; padding:7px 8px 7px 0; font-size:11px}
+    table.clause td.ct{padding:7px 12px 7px 0; font-size:11.2px}
+    .sec{margin:16px 0 8px; padding:4px 12px}
+    .lead{margin:10px 0 14px}
+    .doc-head{padding-bottom:12px}
+    h1.ts{font-size:22px; letter-spacing:.34em}
+    .toolbar, .hint{display:none !important}
+    .btn{display:none !important}
+    .scr{display:none !important}
+    tr.addrow{display:none !important}
+    .delbtn{display:none !important}
+    td.num:hover, td.cl:hover, td.ct:hover{background:transparent}
+    tr.cl-edited td.num, tr.cl-edited td.cl{color:inherit}
+    tr.hl.cl-edited td.num, tr.hl.cl-edited td.cl{color:var(--green)}
+    tr.cl-edited td.ct{box-shadow:none}
+    .ed{border-bottom:none; padding:0; background:transparent !important; color:inherit !important; font-weight:inherit}
+    tr.hl td{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+    .sec{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+    h1.ts{font-size:24px}
+    .doc-head{border-bottom:2.5px solid var(--navy)}
+    .lead{page-break-inside:avoid}
+    .conf{color:#92400E; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="g-eyebrow">HKU PMBA6048 &middot; Hackathon</div>
+    <div class="g-title">Deal Room Access</div>
+    <div class="g-sub">Zhipu AI &middot; Series B &mdash; live negotiation copy.<br>Authorized participants only.</div>
+    <input type="password" id="gateInput" placeholder="Enter passcode" autocomplete="off" autofocus>
+    <button class="g-btn" id="gateBtn" type="button">Enter Deal Room</button>
+    <div class="g-err" id="gateErr"></div>
+  </div>
+</div>
+
+<div class="sheet">
+
+  <div class="toolbar">
+    <div class="tb-title">Zhipu AI · Series B · Live Term Sheet</div>
+    <span class="editcount" id="editcount">0 clauses changed</span>
+    <button class="btn btn-reset" id="btnReset" type="button">Reset to Proposal</button>
+    <button class="btn btn-print" id="btnPrint" type="button">Print to PDF &#9656;</button>
+  </div>
+
+  <div class="inner">
+
+    <div class="doc-head">
+      <div class="conf">Strictly Private &amp; Confidential — For Discussion Purposes Only</div>
+      <h1 class="ts">T E R M&nbsp;S H E E T</h1>
+      <div class="subline">
+        <div class="sub">Series B negotiation copy — every clause editable live; defaults are our proposal (matches the deck)</div>
+        <div class="date">Date: <span class="ed" id="f_date">18 September 2026</span></div>
+      </div>
+    </div>
+
+    <div class="lead">
+      Interactive copy of the Series B term sheet for Zhipu AI (the “Company”). Every clause number, title and body is editable in the room;
+      <span class="scr">“＋ Add clause” appends a new numbered clause (× removes clauses you added). </span>This page prints to a clean A4 PDF. Non-binding except clauses 2.12, 2.15 and 2.17–2.19.
+    </div>
+
+    <!-- ============ 1.0 ============ -->
+    <div class="sec">1.0&nbsp;&nbsp;INVESTMENT DESCRIPTION</div>
+    <table class="clause">
+      <tr>
+        <td class="num"><span class="numedit">1.1</span></td><td class="cl">Corporate Entity</td>
+        <td class="ct">Zhipu AI — Beijing Zhipu Huazhang Technology Co., Ltd.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">1.2</span></td><td class="cl">Principal Business</td>
+        <td class="ct">GLM frontier-model family; MaaS platform delivering API, agent and coding intelligence to B2B customers</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">1.3</span></td><td class="cl">Investors</td>
+        <td class="ct">Outside investors and its affiliates, associates and other investors collectively hereinafter referred to as the “Series B lead investor and affiliates”.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">1.4</span></td><td class="cl">Financing Required</td>
+        <td class="ct">US$342M as common equity (primary) with terms and conditions as described below; single closing at completion. Funds utilization: compute capex and frontier R&amp;D, agreed between the Investors and the Company.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">1.5</span></td><td class="cl">Capital &amp; Investment Structure</td>
+        <td class="ct">US$1.30bn post-money; Investors hold 26.3% fully diluted; existing strategic shareholders (Alibaba / Tencent / Meituan / Ant) remain on the register. Investors support a future ESOP pool up to 10%, sized with board approval (investor director included).</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">1.7</span></td><td class="cl">Restrictions on IPO</td>
+        <td class="ct">The Company may list at any time with the specific approval of 75% of its shareholders <span class="muted">plus board consent, which includes the investor director (see 2.5)</span>.</td>
+      </tr>
+    </table>
+
+    <!-- ============ 2.0 ============ -->
+    <div class="sec">2.0&nbsp;&nbsp;SHARE PURCHASE AGREEMENT</div>
+    <table class="clause">
+      <tr>
+        <td class="num"><span class="numedit">2.1</span></td><td class="cl">Conditions Precedent</td>
+        <td class="ct">
+          <ul class="tick">
+            <li>Board and existing-shareholder approvals; business, legal &amp; financial DD satisfactory to the Investors</li>
+            <li>Regulatory: foreign-investment security review and AI-sector clearances</li>
+            <li>Key-man life insurance; founder employment &amp; IP agreements executed within 30 days of definitive agreement</li>
+            <li>SHA and articles in agreed form; Investor IC approval; agreed budget completed</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.2</span></td><td class="cl">Termination</td>
+        <td class="ct">The SHA remains in effect while the Investors hold any equity, or until a Liquidity Event:
+          <span class="muted">(a) a firm underwritten public offering; or (b) any issuance, transfer or encumbrance giving control, or a transfer of substantial assets, to a third party.</span></td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.4</span></td><td class="cl">Reporting Provisions</td>
+        <td class="ct">Until a Liquidity Event, and not conditioned on holding level:
+          <ul class="tick">
+            <li>Quarterly management accounts + ARR / token-volume / gross-margin KPI pack vs budget</li>
+            <li>Annual audited HKFRS financials; capex budgets; agendas &amp; minutes of board meetings</li>
+            <li>Board convenes on Investor request; any matter tabled on demand</li>
+          </ul>
+        </td>
+      </tr>
+      <tr class="hl">
+        <td class="num"><span class="numedit">2.5</span></td><td class="cl">Board Representation — tiered by stake</td>
+        <td class="ct">
+          <div class="big">&#8805; 20% holding &#8594; 1 of 5 board seats &nbsp;·&nbsp; 10–20% &#8594; board observer &nbsp;·&nbsp; &lt; 10% &#8594; information rights</div>
+          <ul class="tick">
+            <li>Applies symmetrically to every shareholder — including strategic anchors</li>
+            <li>Veto rights &amp; reporting do <b>not</b> step down with dilution; seats sunset at listing per HKEX INED rules</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.6</span></td><td class="cl">Shareholder Support</td>
+        <td class="ct">The Investors give no warranty or guarantee for facilities required by the Company in the ordinary course of business.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.7</span></td><td class="cl">Right of First Offer</td>
+        <td class="ct">Prior to any Liquidity Event, a transferring holder offers to all holders pro rata; 30-day acceptance window. Family / affiliate transfers exempt.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.8</span></td><td class="cl">Pre-emptive Rights</td>
+        <td class="ct">On any new issuance the Investors may subscribe so as to maintain their percentage — <span class="muted">the guard that keeps the &#8805;20% board-seat threshold intact through the pre-IPO round.</span></td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.9</span></td><td class="cl">Tag-along Rights</td>
+        <td class="ct">If the founders sell and together retain &lt; 50%, Investors may sell all shares on the same terms, in priority; otherwise proportional participation applies.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.10</span></td><td class="cl">Exit</td>
+        <td class="ct">
+          <ul class="tick">
+            <li>Investors have the right, but not the obligation, to sell at IPO; Company to use best endeavors for advantageous listing timing</li>
+            <li>Redemption: no investor put before year 7; thereafter only if no liquidity event, at cost, with board consent — exit remains listing or trade sale, not a forced buyback</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.11</span></td><td class="cl">Listing</td>
+        <td class="ct">The Company shall procure listing on HKEX Main Board.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.12</span></td><td class="cl">Expenses <span class="muted">(binding)</span></td>
+        <td class="ct">All transaction expenses, including legal and commercial DD, borne by each party respectively.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.13</span></td><td class="cl">Governing Law</td>
+        <td class="ct">Subscription and Shareholders Agreement governed by the laws of Hong Kong.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.14</span></td><td class="cl">Arbitration</td>
+        <td class="ct">Disputes referred to HKIAC arbitration in Hong Kong, mutually agreed arbitrator.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.15</span></td><td class="cl">Exclusivity <span class="muted">(binding)</span></td>
+        <td class="ct">30-day exclusivity from signing; no solicitation or competing discussions.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.16</span></td><td class="cl">Definitive Documentation</td>
+        <td class="ct">This term sheet is non-binding except 2.12 (Expenses) and 2.15 (Exclusivity); consummation subject to definitive agreements and CPs.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.17</span></td><td class="cl">Confidentiality</td>
+        <td class="ct">The Investors keep all due-diligence and data-room information confidential, use it solely to evaluate this transaction, and return or destroy it if the deal does not proceed. Data-room access is tiered and watermarked.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.18</span></td><td class="cl">Non-solicit &amp; Non-circumvention</td>
+        <td class="ct">For 24 months from signing, the Investors shall not solicit the Company&#8217;s employees, nor circumvent the Company to transact with its partners (cloud providers, customers) introduced during diligence.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">2.19</span></td><td class="cl">Announcements</td>
+        <td class="ct">Neither party discloses the existence or terms of this transaction without the other&#8217;s prior written consent, except as required by law or regulators.</td>
+      </tr>
+    </table>
+
+    <div class="hint">
+      Every clause is editable — click any number, title or body text to negotiate live; “＋ Add clause” appends a new numbered clause
+      (× removes clauses you added). Changes highlight amber and are counted above; print produces a clean term-sheet PDF.
+    </div>
+
+    <div class="sig">
+      <div class="party">
+        <div class="who">For the Company — Zhipu AI</div>
+        <div class="line"></div>
+        <div class="cap">Signature / Name / Title</div>
+      </div>
+      <div class="party">
+        <div class="who">For the Investors</div>
+        <div class="line"></div>
+        <div class="cap">Signature / Name / Title</div>
+      </div>
+    </div>
+
+    <div class="foot">
+      Structure adapted from the S4 Term Sheet sample (VC/PE). Thresholds and values per the Zhipu Series B case and our proposal — see deck pages 17–18.
+      This document is a negotiation aid prepared for the HKU PMBA6048 Hackathon and does not constitute investment advice.
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  /* ---------- access gate ---------- */
+  var HASH = 'c1872735668ea55943b1fcc212d3805394059c5fc59b4b7ab4e584f634ca0fc8';
+  var KEY = 'glm-termsheet-gate-v1';
+  function sha256(str){
+    var buf = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', buf).then(function(h){
+      return Array.prototype.map.call(new Uint8Array(h), function(b){
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+    });
+  }
+  function unlock(){ localStorage.setItem(KEY, HASH); }
+  function openGate(){
+    var g = document.getElementById('gate');
+    if (g) g.parentNode.removeChild(g);
+    document.body.style.overflow = '';
+  }
+  (function initGate(){
+    if (localStorage.getItem(KEY) === HASH) { openGate(); return; }
+    document.body.style.overflow = 'hidden';
+    var input = document.getElementById('gateInput');
+    var btn = document.getElementById('gateBtn');
+    var err = document.getElementById('gateErr');
+    var tries = 0;
+    function attempt(){
+      err.textContent = '';
+      sha256(input.value).then(function(h){
+        if (h === HASH) { unlock(); openGate(); }
+        else {
+          tries++;
+          input.value = ''; input.focus();
+          err.textContent = tries >= 3 ? 'Incorrect passcode. Ask the deal team.' : 'Incorrect passcode.';
+        }
+      });
+    }
+    btn.addEventListener('click', attempt);
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') attempt(); });
+  })();
+
+  /* ---------- header fields (date) ---------- */
+  var DEFAULTS = {};
+  var fields = document.querySelectorAll('.ed');
+  var countEl = document.getElementById('editcount');
+  var CLAUSES = [];
+
+  function norm(s){ return (s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+  function makeEditable(el, opts){
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var t = (e.clipboardData || window.clipboardData).getData('text/plain').replace(/\s+/g, ' ').trim();
+      document.execCommand('insertText', false, t);
+    });
+    if (opts && opts.enterBlur) {
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); el.blur(); }
+      });
+    }
+  }
+
+  fields.forEach(function (el) {
+    DEFAULTS[el.id] = el.textContent;
+    makeEditable(el, { enterBlur: true });
+    el.addEventListener('input', function () {
+      if (el.textContent !== DEFAULTS[el.id]) el.classList.add('edited');
+      else el.classList.remove('edited');
+      refresh();
+    });
+  });
+
+  /* ---------- clauses: number + title + body all editable ---------- */
+  function setupClause(tr, isNew) {
+    var num = tr.querySelector('.numedit');
+    var cl = tr.querySelector('td.cl');
+    var ct = tr.querySelector('td.ct');
+    if (!num || !cl || !ct) return;
+    var rec = {
+      tr: tr, num: num, cl: cl, ct: ct, isNew: !!isNew,
+      defHTML: [num.innerHTML, cl.innerHTML, ct.innerHTML],
+      defTxt: norm(num.innerText) + '\u0001' + norm(cl.innerText) + '\u0001' + norm(ct.innerText)
+    };
+    CLAUSES.push(rec);
+    makeEditable(num, { enterBlur: true });
+    makeEditable(cl, { enterBlur: true });
+    makeEditable(ct);
+    function check() {
+      var cur = norm(num.innerText) + '\u0001' + norm(cl.innerText) + '\u0001' + norm(ct.innerText);
+      tr.classList.toggle('cl-edited', !!(rec.isNew || cur !== rec.defTxt));
+      refresh();
+    }
+    [num, cl, ct].forEach(function (c) { c.addEventListener('input', check); });
+    if (rec.isNew) tr.classList.add('cl-edited');
+    var del = tr.querySelector('.delbtn');
+    if (del) del.addEventListener('click', function () {
+      CLAUSES = CLAUSES.filter(function (r) { return r !== rec; });
+      tr.parentNode.removeChild(tr);
+      refresh();
+    });
+  }
+
+  function nextNumber(table) {
+    var best = null;
+    table.querySelectorAll('td.num .numedit').forEach(function (sp) {
+      var m = (sp.innerText || '').match(/^\s*(\d+)\.(\d+)\s*$/);
+      if (m) {
+        var pair = [parseInt(m[1], 10), parseInt(m[2], 10)];
+        if (!best || pair[0] > best[0] || (pair[0] === best[0] && pair[1] > best[1])) best = pair;
+      }
+    });
+    return best ? (best[0] + '.' + (best[1] + 1)) : '';
+  }
+
+  function selectAll(el) {
+    var range = document.createRange(); range.selectNodeContents(el);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  }
+
+  function addClause(table) {
+    var addrow = table.querySelector('tr.addrow');
+    var tr = document.createElement('tr');
+    var n = nextNumber(table);
+    tr.innerHTML = '<td class="num"><span class="numedit">' + n + '</span>' +
+                   '<button class="delbtn" type="button" title="Remove clause">&#215;</button></td>' +
+                   '<td class="cl">New Clause</td>' +
+                   '<td class="ct">Describe the terms here&#8230;</td>';
+    table.insertBefore(tr, addrow);
+    setupClause(tr, true);
+    var ct = tr.querySelector('td.ct');
+    ct.addEventListener('focus', function once() {
+      if (norm(ct.innerText) === 'Describe the terms here\u2026') selectAll(ct);
+      ct.removeEventListener('focus', once);
+    });
+    refresh();
+    var cl = tr.querySelector('td.cl');
+    cl.focus(); selectAll(cl);
+  }
+
+  document.querySelectorAll('table.clause').forEach(function (table) {
+    var addrow = document.createElement('tr');
+    addrow.className = 'addrow';
+    addrow.innerHTML = '<td colspan="3"><button class="addbtn" type="button">＋ Add clause</button></td>';
+    table.appendChild(addrow);
+    addrow.querySelector('.addbtn').addEventListener('click', function () { addClause(table); });
+    table.querySelectorAll('tr').forEach(function (tr) {
+      if (!tr.classList.contains('addrow')) setupClause(tr, false);
+    });
+  });
+
+  function refresh() {
+    var n = document.querySelectorAll('.ed.edited').length +
+            document.querySelectorAll('tr.cl-edited').length;
+    countEl.textContent = n + (n === 1 ? ' clause changed' : ' clauses changed');
+  }
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    fields.forEach(function (el) {
+      el.textContent = DEFAULTS[el.id];
+      el.classList.remove('edited');
+    });
+    CLAUSES.forEach(function (r) {
+      if (r.isNew) { r.tr.parentNode.removeChild(r.tr); return; }
+      r.num.innerHTML = r.defHTML[0];
+      r.cl.innerHTML = r.defHTML[1];
+      r.ct.innerHTML = r.defHTML[2];
+      r.tr.classList.remove('cl-edited');
+    });
+    CLAUSES = CLAUSES.filter(function (r) { return !r.isNew; });
+    refresh();
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', function () {
+    document.activeElement && document.activeElement.blur();
+    window.print();
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>
