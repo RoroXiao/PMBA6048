@@ -31,6 +31,7 @@
   }
   .toolbar .tb-title{font-size:12px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:#9FC3E8; flex:1}
   .toolbar .editcount{font-size:11.5px; color:#FDE68A; font-weight:600; white-space:nowrap}
+  .toolbar .statcount{font-size:11.5px; color:#9FD8B4; font-weight:600; white-space:nowrap}
   .btn{
     border:none; cursor:pointer; font-size:12px; font-weight:700; border-radius:999px;
     padding:7px 16px; letter-spacing:.02em; transition:transform .06s ease, box-shadow .12s ease;
@@ -61,8 +62,9 @@
   td.cl{width:190px; vertical-align:top; padding:10px 8px 10px 0; font-weight:700; color:var(--navy); font-size:12.5px}
   td.ct{vertical-align:top; padding:10px 14px 10px 0; font-size:12.8px}
   td.ct .muted{color:var(--gray); font-size:11.8px}
-  ul.tick{margin:4px 0 0; padding-left:16px}
+  ul.tick{margin:4px 0 0; padding-left:2px; list-style:none}
   ul.tick li{margin:2.5px 0}
+  .subn{font-weight:800; color:var(--blue); font-size:11.5px; margin-right:7px; white-space:nowrap}
 
   /* highlight card row — 2.5 board */
   tr.hl td{background:var(--green-bg); border-top:1px solid var(--green-bd); border-bottom:1px solid var(--green-bd)}
@@ -78,6 +80,30 @@
   tr.cl-edited td.num, tr.cl-edited td.cl{color:var(--amber)}
   tr.cl-edited td.ct{box-shadow:inset 3px 0 0 var(--amber-bd)}
   tr.hl.cl-edited td.num, tr.hl.cl-edited td.cl{color:var(--amber)}
+
+  /* ---------- negotiation status ---------- */
+  td.st{width:148px; vertical-align:top; padding:10px 8px 10px 10px; border-left:1px dashed var(--bord)}
+  .stbtns{display:flex; gap:5px; margin-bottom:2px}
+  .stbtn{flex:1; border:1px solid var(--bord); background:#F6F9FC; color:var(--gray); font-size:10px; font-weight:700;
+    border-radius:999px; padding:4px 0; cursor:pointer; letter-spacing:.02em}
+  .stbtn:hover{border-color:var(--blue); color:var(--blue)}
+  .sb-agree.on{background:var(--green-bg); border-color:var(--green-bd); color:var(--green)}
+  .sb-open.on{background:#FDECEA; border-color:#E5B4AE; color:#B42318}
+  .poswrap{display:none}
+  tr.st-open .poswrap{display:block}
+  .posbox{border:1px solid var(--bord); border-radius:4px; margin-top:5px; background:#FBFCFE}
+  .posbox .poslab{display:block; font-size:8.5px; font-weight:800; letter-spacing:.14em; padding:3px 7px 0}
+  .pb-co .poslab{color:var(--blue)}
+  .pb-inv .poslab{color:var(--amber)}
+  .pb-co{border-left:3px solid var(--blue)}
+  .pb-inv{border-left:3px solid var(--amber-bd)}
+  .posbox .postxt{display:block; font-size:10.5px; color:var(--body); padding:1px 7px 6px; min-height:15px; cursor:text; outline:none}
+  .posbox .postxt.ph{color:#A6B4C6}
+  .posbox .postxt:focus{background:#EDF4FB}
+  tr.st-agreed td.st{background:var(--green-bg)}
+  tr.st-open td.st{background:#FEF7F6}
+  tr.st-agreed td.num{box-shadow:inset 3px 0 0 var(--green)}
+  tr.st-open td.num{box-shadow:inset 3px 0 0 #C9584E}
 
   /* ---------- add / remove clause ---------- */
   tr.addrow td{padding:8px 4px 10px 12px}
@@ -154,6 +180,7 @@
     .btn{display:none !important}
     .scr{display:none !important}
     tr.addrow{display:none !important}
+    td.st{display:none !important}
     .delbtn{display:none !important}
     td.num:hover, td.cl:hover, td.ct:hover{background:transparent}
     tr.cl-edited td.num, tr.cl-edited td.cl{color:inherit}
@@ -187,6 +214,7 @@
   <div class="toolbar">
     <div class="tb-title">Zhipu AI · Series B · Live Term Sheet</div>
     <span class="editcount" id="editcount">0 clauses changed</span>
+    <span class="statcount" id="statcount"></span>
     <button class="btn btn-reset" id="btnReset" type="button">Reset to Proposal</button>
     <button class="btn btn-print" id="btnPrint" type="button">Print to PDF &#9656;</button>
   </div>
@@ -198,13 +226,13 @@
       <h1 class="ts">T E R M&nbsp;S H E E T</h1>
       <div class="subline">
         <div class="sub">Series B negotiation copy — every clause editable live; defaults are our proposal (matches the deck)</div>
-        <div class="date">Date: <span class="ed" id="f_date">18 September 2026</span></div>
+        <div class="date">Date: <span class="ed" id="f_date">2026.9.20</span></div>
       </div>
     </div>
 
     <div class="lead">
       Interactive copy of the Series B term sheet for Zhipu AI (the “Company”). Every clause number, title and body is editable in the room;
-      <span class="scr">“＋ Add clause” appends a new numbered clause (× removes clauses you added). </span>This page prints to a clean A4 PDF. Non-binding except clauses 2.12, 2.15 and 2.17–2.19.
+      <span class="scr">“＋ Add clause” appends a new numbered clause (× removes clauses you added). </span>This page prints to a clean A4 PDF. Non-binding except clauses 3.1, 3.4 and 3.6–3.8.
     </div>
 
     <!-- ============ 1.0 ============ -->
@@ -231,8 +259,8 @@
         <td class="ct">US$1.30bn post-money; Investors hold 26.3% fully diluted; existing strategic shareholders (Alibaba / Tencent / Meituan / Ant) remain on the register. Investors support a future ESOP pool up to 10%, sized with board approval (investor director included).</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">1.7</span></td><td class="cl">Restrictions on IPO</td>
-        <td class="ct">The Company may list at any time with the specific approval of 75% of its shareholders <span class="muted">plus board consent, which includes the investor director (see 2.5)</span>.</td>
+        <td class="num"><span class="numedit">1.6</span></td><td class="cl">Restrictions on IPO</td>
+        <td class="ct">The Company may list at any time with the specific approval of 75% of its shareholders <span class="muted">plus board consent, which includes the investor director (see 2.4)</span>.</td>
       </tr>
     </table>
 
@@ -243,10 +271,10 @@
         <td class="num"><span class="numedit">2.1</span></td><td class="cl">Conditions Precedent</td>
         <td class="ct">
           <ul class="tick">
-            <li>Board and existing-shareholder approvals; business, legal &amp; financial DD satisfactory to the Investors</li>
-            <li>Regulatory: foreign-investment security review and AI-sector clearances</li>
-            <li>Key-man life insurance; founder employment &amp; IP agreements executed within 30 days of definitive agreement</li>
-            <li>SHA and articles in agreed form; Investor IC approval; agreed budget completed</li>
+            <li><span class="subn">2.1.1</span>Board and existing-shareholder approvals; business, legal &amp; financial DD satisfactory to the Investors</li>
+            <li><span class="subn">2.1.2</span>Regulatory: foreign-investment security review and AI-sector clearances</li>
+            <li><span class="subn">2.1.3</span>Key-man life insurance; founder employment &amp; IP agreements executed within 30 days of definitive agreement</li>
+            <li><span class="subn">2.1.4</span>SHA and articles in agreed form; Investor IC approval; agreed budget completed</li>
           </ul>
         </td>
       </tr>
@@ -256,91 +284,112 @@
           <span class="muted">(a) a firm underwritten public offering; or (b) any issuance, transfer or encumbrance giving control, or a transfer of substantial assets, to a third party.</span></td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.4</span></td><td class="cl">Reporting Provisions</td>
+        <td class="num"><span class="numedit">2.3</span></td><td class="cl">Reporting Provisions</td>
         <td class="ct">Until a Liquidity Event, and not conditioned on holding level:
           <ul class="tick">
-            <li>Quarterly management accounts + ARR / token-volume / gross-margin KPI pack vs budget</li>
-            <li>Annual audited HKFRS financials; capex budgets; agendas &amp; minutes of board meetings</li>
-            <li>Board convenes on Investor request; any matter tabled on demand</li>
+            <li><span class="subn">2.3.1</span>Quarterly management accounts + ARR / token-volume / gross-margin KPI pack vs budget</li>
+            <li><span class="subn">2.3.2</span>Annual audited HKFRS financials; capex budgets; agendas &amp; minutes of board meetings</li>
+            <li><span class="subn">2.3.3</span>Board convenes on Investor request; any matter tabled on demand</li>
           </ul>
         </td>
       </tr>
-      <tr class="hl">
-        <td class="num"><span class="numedit">2.5</span></td><td class="cl">Board Representation — tiered by stake</td>
+      <tr>
+        <td class="num"><span class="numedit">2.4</span></td><td class="cl">Board Representation — tiered by stake</td>
         <td class="ct">
           <div class="big">&#8805; 20% holding &#8594; 1 of 5 board seats &nbsp;·&nbsp; 10–20% &#8594; board observer &nbsp;·&nbsp; &lt; 10% &#8594; information rights</div>
           <ul class="tick">
-            <li>Applies symmetrically to every shareholder — including strategic anchors</li>
-            <li>Veto rights &amp; reporting do <b>not</b> step down with dilution; seats sunset at listing per HKEX INED rules</li>
+            <li><span class="subn">2.4.1</span>Applies symmetrically to every shareholder — including strategic anchors</li>
+            <li><span class="subn">2.4.2</span>Veto rights &amp; reporting do <b>not</b> step down with dilution; seats sunset at listing per HKEX INED rules</li>
           </ul>
         </td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.6</span></td><td class="cl">Shareholder Support</td>
+        <td class="num"><span class="numedit">2.5</span></td><td class="cl">Shareholder Support</td>
         <td class="ct">The Investors give no warranty or guarantee for facilities required by the Company in the ordinary course of business.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.7</span></td><td class="cl">Right of First Offer</td>
+        <td class="num"><span class="numedit">2.6</span></td><td class="cl">Right of First Offer</td>
         <td class="ct">Prior to any Liquidity Event, a transferring holder offers to all holders pro rata; 30-day acceptance window. Family / affiliate transfers exempt.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.8</span></td><td class="cl">Pre-emptive Rights</td>
+        <td class="num"><span class="numedit">2.7</span></td><td class="cl">Pre-emptive Rights</td>
         <td class="ct">On any new issuance the Investors may subscribe so as to maintain their percentage — <span class="muted">the guard that keeps the &#8805;20% board-seat threshold intact through the pre-IPO round.</span></td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.9</span></td><td class="cl">Tag-along Rights</td>
+        <td class="num"><span class="numedit">2.8</span></td><td class="cl">Tag-along Rights</td>
         <td class="ct">If the founders sell and together retain &lt; 50%, Investors may sell all shares on the same terms, in priority; otherwise proportional participation applies.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.10</span></td><td class="cl">Exit</td>
+        <td class="num"><span class="numedit">2.9</span></td><td class="cl">Exit</td>
         <td class="ct">
           <ul class="tick">
-            <li>Investors have the right, but not the obligation, to sell at IPO; Company to use best endeavors for advantageous listing timing</li>
-            <li>Redemption: no investor put before year 7; thereafter only if no liquidity event, at cost, with board consent — exit remains listing or trade sale, not a forced buyback</li>
+            <li><span class="subn">2.9.1</span>Investors have the right, but not the obligation, to sell at IPO; Company to use best endeavors for advantageous listing timing</li>
+            <li><span class="subn">2.9.2</span>Redemption: no investor put before year 7; thereafter only if no liquidity event, at cost, with board consent — exit remains listing or trade sale, not a forced buyback</li>
           </ul>
         </td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.11</span></td><td class="cl">Listing</td>
+        <td class="num"><span class="numedit">2.10</span></td><td class="cl">Listing</td>
         <td class="ct">The Company shall procure listing on HKEX Main Board.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.12</span></td><td class="cl">Expenses <span class="muted">(binding)</span></td>
+        <td class="num"><span class="numedit">2.11</span></td><td class="cl">IPO Lock-up</td>
+        <td class="ct">Each shareholder — including the Investors and founders — shall not sell, transfer or encumber any shares for 180 days following listing. Early release or shortening lies with the Company and the underwriters, so the Company keeps flexibility to time follow-on liquidity to market conditions.</td>
+      </tr>
+    </table>
+
+    <!-- ============ 3.0 ============ -->
+    <div class="sec">3.0&nbsp;&nbsp;OTHERS</div>
+    <table class="clause">
+      <tr>
+        <td class="num"><span class="numedit">3.1</span></td><td class="cl">Expenses <span class="muted">(binding)</span></td>
         <td class="ct">All transaction expenses, including legal and commercial DD, borne by each party respectively.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.13</span></td><td class="cl">Governing Law</td>
+        <td class="num"><span class="numedit">3.2</span></td><td class="cl">Governing Law</td>
         <td class="ct">Subscription and Shareholders Agreement governed by the laws of Hong Kong.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.14</span></td><td class="cl">Arbitration</td>
+        <td class="num"><span class="numedit">3.3</span></td><td class="cl">Arbitration</td>
         <td class="ct">Disputes referred to HKIAC arbitration in Hong Kong, mutually agreed arbitrator.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.15</span></td><td class="cl">Exclusivity <span class="muted">(binding)</span></td>
+        <td class="num"><span class="numedit">3.4</span></td><td class="cl">Exclusivity <span class="muted">(binding)</span></td>
         <td class="ct">30-day exclusivity from signing; no solicitation or competing discussions.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.16</span></td><td class="cl">Definitive Documentation</td>
-        <td class="ct">This term sheet is non-binding except 2.12 (Expenses) and 2.15 (Exclusivity); consummation subject to definitive agreements and CPs.</td>
+        <td class="num"><span class="numedit">3.5</span></td><td class="cl">Definitive Documentation</td>
+        <td class="ct">This term sheet is non-binding except 3.1 (Expenses) and 3.4 (Exclusivity); consummation subject to definitive agreements and CPs.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.17</span></td><td class="cl">Confidentiality</td>
+        <td class="num"><span class="numedit">3.6</span></td><td class="cl">Confidentiality</td>
         <td class="ct">The Investors keep all due-diligence and data-room information confidential, use it solely to evaluate this transaction, and return or destroy it if the deal does not proceed. Data-room access is tiered and watermarked.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.18</span></td><td class="cl">Non-solicit &amp; Non-circumvention</td>
+        <td class="num"><span class="numedit">3.7</span></td><td class="cl">Non-solicit &amp; Non-circumvention</td>
         <td class="ct">For 24 months from signing, the Investors shall not solicit the Company&#8217;s employees, nor circumvent the Company to transact with its partners (cloud providers, customers) introduced during diligence.</td>
       </tr>
       <tr>
-        <td class="num"><span class="numedit">2.19</span></td><td class="cl">Announcements</td>
+        <td class="num"><span class="numedit">3.8</span></td><td class="cl">Announcements</td>
         <td class="ct">Neither party discloses the existence or terms of this transaction without the other&#8217;s prior written consent, except as required by law or regulators.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">3.9</span></td><td class="cl">Notices</td>
+        <td class="ct">Notices under this term sheet and the definitive agreements shall be in writing, delivered by email or courier to the addresses on the signature pages, and deemed received upon delivery.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">3.10</span></td><td class="cl">Amendment &amp; Waiver</td>
+        <td class="ct">This term sheet may be amended or waived only in writing signed by the Company and the Investors; binding clauses may only be waived by the party entitled to their benefit.</td>
+      </tr>
+      <tr>
+        <td class="num"><span class="numedit">3.11</span></td><td class="cl">Entire Agreement</td>
+        <td class="ct">This term sheet supersedes all prior discussions between the parties on its subject matter and records the complete proposal as of the date above; definitive agreements will supersede it upon execution.</td>
       </tr>
     </table>
 
     <div class="hint">
       Every clause is editable — click any number, title or body text to negotiate live; “＋ Add clause” appends a new numbered clause
-      (× removes clauses you added). Changes highlight amber and are counted above; print produces a clean term-sheet PDF.
+      (× removes clauses you added). Changes highlight amber and are counted above. Use ✓ Agreed / ⚖ Open per clause to track negotiation status — Open reveals side-by-side company / investor positions; status is hidden when printing.
     </div>
 
     <div class="sig">
@@ -409,6 +458,7 @@
   var DEFAULTS = {};
   var fields = document.querySelectorAll('.ed');
   var countEl = document.getElementById('editcount');
+  var statEl = document.getElementById('statcount');
   var CLAUSES = [];
 
   function norm(s){ return (s || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim(); }
@@ -466,6 +516,47 @@
       tr.parentNode.removeChild(tr);
       refresh();
     });
+
+    /* ---------- negotiation status (agreed / open + CO/INV positions) ---------- */
+    var st = document.createElement('td');
+    st.className = 'st';
+    st.innerHTML =
+      '<div class="stbtns">' +
+        '<button class="stbtn sb-agree" type="button" title="Confirmed, no dispute">&#10003; Agreed</button>' +
+        '<button class="stbtn sb-open" type="button" title="Still negotiating">&#9878; Open</button>' +
+      '</div>' +
+      '<div class="poswrap">' +
+        '<div class="posbox pb-co"><span class="poslab">COMPANY</span><span class="postxt" data-ph="Company position&#8230;"></span></div>' +
+        '<div class="posbox pb-inv"><span class="poslab">INVESTORS</span><span class="postxt" data-ph="Investors position&#8230;"></span></div>' +
+      '</div>';
+    tr.appendChild(st);
+    rec.st = st;
+    rec.pos = [];
+    function setSt(mode) {
+      tr.classList.remove('st-agreed', 'st-open');
+      st.querySelectorAll('.stbtn').forEach(function (b) { b.classList.remove('on'); });
+      if (mode === 'agreed') { tr.classList.add('st-agreed'); st.querySelector('.sb-agree').classList.add('on'); }
+      if (mode === 'open') { tr.classList.add('st-open'); st.querySelector('.sb-open').classList.add('on'); }
+      refresh();
+    }
+    st.querySelector('.sb-agree').addEventListener('click', function () {
+      setSt(tr.classList.contains('st-agreed') ? 'none' : 'agreed');
+    });
+    st.querySelector('.sb-open').addEventListener('click', function () {
+      setSt(tr.classList.contains('st-open') ? 'none' : 'open');
+    });
+    st.querySelectorAll('.postxt').forEach(function (el) {
+      var ph = el.getAttribute('data-ph');
+      el.textContent = ph; el.classList.add('ph');
+      rec.pos.push({ el: el, ph: ph });
+      makeEditable(el, { enterBlur: true });
+      el.addEventListener('focus', function () {
+        if (el.textContent === ph) { selectAll(el); el.classList.remove('ph'); }
+      });
+      el.addEventListener('blur', function () {
+        if (norm(el.innerText) === '') { el.textContent = ph; el.classList.add('ph'); }
+      });
+    });
   }
 
   function nextNumber(table) {
@@ -508,7 +599,7 @@
   document.querySelectorAll('table.clause').forEach(function (table) {
     var addrow = document.createElement('tr');
     addrow.className = 'addrow';
-    addrow.innerHTML = '<td colspan="3"><button class="addbtn" type="button">＋ Add clause</button></td>';
+    addrow.innerHTML = '<td colspan="4"><button class="addbtn" type="button">＋ Add clause</button></td>';
     table.appendChild(addrow);
     addrow.querySelector('.addbtn').addEventListener('click', function () { addClause(table); });
     table.querySelectorAll('tr').forEach(function (tr) {
@@ -520,6 +611,9 @@
     var n = document.querySelectorAll('.ed.edited').length +
             document.querySelectorAll('tr.cl-edited').length;
     countEl.textContent = n + (n === 1 ? ' clause changed' : ' clauses changed');
+    var ag = document.querySelectorAll('tr.st-agreed').length;
+    var op = document.querySelectorAll('tr.st-open').length;
+    statEl.textContent = (ag || op) ? '\u2713 ' + ag + ' agreed \u00b7 \u2696 ' + op + ' open' : '';
   }
 
   document.getElementById('btnReset').addEventListener('click', function () {
@@ -533,6 +627,9 @@
       r.cl.innerHTML = r.defHTML[1];
       r.ct.innerHTML = r.defHTML[2];
       r.tr.classList.remove('cl-edited');
+      r.tr.classList.remove('st-agreed', 'st-open');
+      if (r.st) r.st.querySelectorAll('.stbtn').forEach(function (b) { b.classList.remove('on'); });
+      (r.pos || []).forEach(function (p) { p.el.textContent = p.ph; p.el.classList.add('ph'); });
     });
     CLAUSES = CLAUSES.filter(function (r) { return !r.isNew; });
     refresh();
